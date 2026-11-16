@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 enum TipoPeca { peao, torre, cavalo, bispo, rainha, rei }
+
 enum CorPeca { branco, preto }
 
 enum ModoSelecao {
@@ -173,10 +174,12 @@ class JogadorStatus {
 }
 
 void main() {
-  runApp(const MaterialApp(
-    home: TabuleiroXadrez(),
-    debugShowCheckedModeBanner: false,
-  ));
+  runApp(
+    const MaterialApp(
+      home: TabuleiroXadrez(),
+      debugShowCheckedModeBanner: false,
+    ),
+  );
 }
 
 class TabuleiroXadrez extends StatefulWidget {
@@ -265,8 +268,10 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
       raridade: 'Comum',
       aplicarEfeito: (s) {
         final st = s._status(s.turnoAtual);
-        st.descontoPercentualProximaPeca =
-            max(st.descontoPercentualProximaPeca, 0.20);
+        st.descontoPercentualProximaPeca = max(
+          st.descontoPercentualProximaPeca,
+          0.20,
+        );
       },
     ),
     CartaEfeito(
@@ -298,7 +303,8 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
           'Escolha uma peça sua para ficar protegida contra captura por 1 rodada.',
       raridade: 'Comum',
       podeUsar: (s) => s._existeAlvoParaModo(ModoSelecao.protecaoTemporaria),
-      aplicarEfeito: (s) => s._iniciarModoSelecao(ModoSelecao.protecaoTemporaria),
+      aplicarEfeito: (s) =>
+          s._iniciarModoSelecao(ModoSelecao.protecaoTemporaria),
     ),
     CartaEfeito(
       titulo: 'Extração Colonial',
@@ -382,8 +388,10 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
       raridade: 'Rara',
       aplicarEfeito: (s) {
         final st = s._status(s.turnoAtual);
-        st.descontoPercentualProximaPeca =
-            max(st.descontoPercentualProximaPeca, 0.35);
+        st.descontoPercentualProximaPeca = max(
+          st.descontoPercentualProximaPeca,
+          0.35,
+        );
       },
     ),
     CartaEfeito(
@@ -419,8 +427,7 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
     ),
     CartaEfeito(
       titulo: 'Tratado Desigual',
-      descricao:
-          'Acordo sob mira de mosquetes. Roube 20 moedas do adversário.',
+      descricao: 'Acordo sob mira de mosquetes. Roube 20 moedas do adversário.',
       raridade: 'Rara',
       aplicarEfeito: (s) => s._roubarDinheiro(20),
     ),
@@ -472,7 +479,8 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
           'Escolha 1 peça adversária (não o Rei) para congelar por 2 rodadas.',
       raridade: 'Épica',
       podeUsar: (s) => s._existeAlvoParaModo(ModoSelecao.paralisia2Rodadas),
-      aplicarEfeito: (s) => s._iniciarModoSelecao(ModoSelecao.paralisia2Rodadas),
+      aplicarEfeito: (s) =>
+          s._iniciarModoSelecao(ModoSelecao.paralisia2Rodadas),
     ),
     CartaEfeito(
       titulo: 'Tesouro da Coroa',
@@ -564,7 +572,9 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
     }
     final int origRow = origem ~/ 8;
     final int origCol = origem % 8;
-    final int rowTras = (turnoAtual == CorPeca.branco) ? origRow + 1 : origRow - 1;
+    final int rowTras = (turnoAtual == CorPeca.branco)
+        ? origRow + 1
+        : origRow - 1;
 
     final List<List<int>> candidatos = [
       [origRow, origCol - 1],
@@ -754,15 +764,19 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
   void _abrirTelaEscolhaCartas({bool comSetState = true}) {
     final List<Carta> poolCartas = numeroRodada == 1
         ? deckDisponivel
-            .where((carta) =>
-                carta.tipoPeca == TipoPeca.peao ||
-                carta.tipoPeca == TipoPeca.bispo ||
-                carta.tipoPeca == TipoPeca.cavalo)
-            .toList()
+              .where(
+                (carta) =>
+                    carta.tipoPeca == TipoPeca.peao ||
+                    carta.tipoPeca == TipoPeca.bispo ||
+                    carta.tipoPeca == TipoPeca.cavalo,
+              )
+              .toList()
         : deckDisponivel;
 
     opcoesEscolhaAtual = List.generate(
-        2, (_) => poolCartas[_random.nextInt(poolCartas.length)]);
+      2,
+      (_) => poolCartas[_random.nextInt(poolCartas.length)],
+    );
 
     void acao() {
       if (numeroRodada > 1) {
@@ -789,8 +803,11 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
   CartaEfeito _sortearCartaPorRaridade({bool apenasComum = false}) {
     List<CartaEfeito> elegiveis(String raridade) {
       return deckEfeitosDisponiveis
-          .where((e) =>
-              e.raridade == raridade && (e.podeUsar == null || e.podeUsar!(this)))
+          .where(
+            (e) =>
+                e.raridade == raridade &&
+                (e.podeUsar == null || e.podeUsar!(this)),
+          )
           .toList();
     }
 
@@ -869,14 +886,16 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
         return;
       }
 
-      bool temCartaJogavel = _getMao(turnoAtual)
-          .any((c) => _custoAcaoCarta(c, turnoAtual) <= acoesRestantes);
+      bool temCartaJogavel = _getMao(
+        turnoAtual,
+      ).any((c) => _custoAcaoCarta(c, turnoAtual) <= acoesRestantes);
 
       if (acoesRestantes <= 0 || !temCartaJogavel) {
         _finalizarTurno();
       } else {
         _mostrarSnackBar(
-            'Peão promovido para ${novoTipo.nome}! Você ainda tem $acoesRestantes ação restante!');
+          'Peão promovido para ${novoTipo.nome}! Você ainda tem $acoesRestantes ação restante!',
+        );
       }
     });
   }
@@ -884,7 +903,8 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
   void _verificarEstadoFimDeJogo() {
     if (_estaEmXequeMate(turnoAtual)) {
       Future.microtask(
-          () => _mostrarFimDeJogo(turnoAtual.oposta, motivo: 'por Xeque-Mate!'));
+        () => _mostrarFimDeJogo(turnoAtual.oposta, motivo: 'por Xeque-Mate!'),
+      );
     } else if (!_estaEmXeque(turnoAtual) &&
         !_temMovimentosValidos(turnoAtual) &&
         !_podeInvocarAlgumaCarta(turnoAtual)) {
@@ -959,8 +979,9 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
       if (!exibeEscolhaDeCarta) {
         _verificarEstadoFimDeJogo();
       } else if (_estaEmXequeMate(turnoAtual)) {
-        Future.microtask(() =>
-            _mostrarFimDeJogo(turnoAtual.oposta, motivo: 'por Xeque-Mate!'));
+        Future.microtask(
+          () => _mostrarFimDeJogo(turnoAtual.oposta, motivo: 'por Xeque-Mate!'),
+        );
       }
     });
   }
@@ -1003,14 +1024,13 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
         int direcao = (cor == CorPeca.branco) ? -1 : 1;
         if (origCol == destCol &&
             destRow == origRow + direcao &&
-            pecaDestino == null) return true;
-        if (diffCol == 1 &&
-            destRow == origRow + direcao &&
-            pecaDestino != null) return true;
+            pecaDestino == null)
+          return true;
+        if (diffCol == 1 && destRow == origRow + direcao && pecaDestino != null)
+          return true;
         return false;
       case TipoPeca.cavalo:
-        return (diffRow == 2 && diffCol == 1) ||
-            (diffRow == 1 && diffCol == 2);
+        return (diffRow == 2 && diffCol == 1) || (diffRow == 1 && diffCol == 2);
       case TipoPeca.bispo:
         return diffRow == diffCol && _caminhoLivre(origem, destino);
       case TipoPeca.torre:
@@ -1026,7 +1046,11 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
   }
 
   bool _casaAtacadaPorPeca(
-      int origem, int destino, TipoPeca tipo, CorPeca cor) {
+    int origem,
+    int destino,
+    TipoPeca tipo,
+    CorPeca cor,
+  ) {
     int origRow = origem ~/ 8;
     int origCol = origem % 8;
     int destRow = destino ~/ 8;
@@ -1040,8 +1064,7 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
         int direcao = (cor == CorPeca.branco) ? -1 : 1;
         return diffCol == 1 && destRow == origRow + direcao;
       case TipoPeca.cavalo:
-        return (diffRow == 2 && diffCol == 1) ||
-            (diffRow == 1 && diffCol == 2);
+        return (diffRow == 2 && diffCol == 1) || (diffRow == 1 && diffCol == 2);
       case TipoPeca.bispo:
         return diffRow == diffCol &&
             diffRow > 0 &&
@@ -1196,8 +1219,10 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
     return _estaEmXeque(cor) && !_temMovimentosValidos(cor);
   }
 
-  void _mostrarFimDeJogo(CorPeca vencedor,
-      {String motivo = 'ao capturar o Rei adversário!'}) {
+  void _mostrarFimDeJogo(
+    CorPeca vencedor, {
+    String motivo = 'ao capturar o Rei adversário!',
+  }) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1217,7 +1242,8 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
               backgroundColor: Colors.brown[700],
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             onPressed: () {
               Navigator.of(context).pop();
@@ -1244,14 +1270,16 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
           ],
         ),
         content: Text(
-            'O Jogador ${jogadorSemMovimentos.nome} não está em xeque, mas não possui nenhum movimento válido. A partida terminou empatada!'),
+          'O Jogador ${jogadorSemMovimentos.nome} não está em xeque, mas não possui nenhum movimento válido. A partida terminou empatada!',
+        ),
         actions: [
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.brown[700],
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             onPressed: () {
               Navigator.of(context).pop();
@@ -1332,9 +1360,9 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
       case ModoSelecao.conferenciaPartilha:
         final TipoPeca tipoDevolvido = pecaNaCasa!.tipo;
         tabuleiro.remove(index);
-        _status(turnoAtual.oposta)
-            .mao
-            .add(Carta(tipoDevolvido, tipoDevolvido.custoBase));
+        _status(
+          turnoAtual.oposta,
+        ).mao.add(Carta(tipoDevolvido, tipoDevolvido.custoBase));
         modoSelecao = ModoSelecao.nenhum;
         _mostrarSnackBar('${tipoDevolvido.nome} devolvido à mão do oponente!');
         break;
@@ -1383,17 +1411,22 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
         }
 
         final int linha = index ~/ 8;
-        bool ladoValido = (turnoAtual == CorPeca.branco && linha >= 6) ||
+        bool ladoValido =
+            (turnoAtual == CorPeca.branco && linha >= 6) ||
             (turnoAtual == CorPeca.preto && linha <= 1);
 
         if (!ladoValido) {
           _mostrarSnackBar(
-              'Invoque apenas nas 2 primeiras fileiras da sua base!');
+            'Invoque apenas nas 2 primeiras fileiras da sua base!',
+          );
           return;
         }
 
-        int custoFinal =
-            _calcularCustoCarta(cartaSelecionada!, turnoAtual, consumir: false);
+        int custoFinal = _calcularCustoCarta(
+          cartaSelecionada!,
+          turnoAtual,
+          consumir: false,
+        );
 
         if (stAtual.dinheiro < custoFinal) {
           _mostrarSnackBar('Dinheiro insuficiente!');
@@ -1408,8 +1441,11 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
         _calcularCustoCarta(cartaSelecionada!, turnoAtual, consumir: true);
         stAtual.dinheiro -= custoFinal;
         stAtual.mao.removeAt(indiceCartaSelecionada!);
-        tabuleiro[index] =
-            Peca(cartaSelecionada!.tipoPeca, turnoAtual, posicao: index);
+        tabuleiro[index] = Peca(
+          cartaSelecionada!.tipoPeca,
+          turnoAtual,
+          posicao: index,
+        );
 
         final stOponente = _status(turnoAtual.oposta);
         if (stOponente.impostoSeloCargas > 0) {
@@ -1431,7 +1467,8 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
           _finalizarTurno();
         } else if (podeMover && temCartaJogavel) {
           _mostrarSnackBar(
-              'Você ainda pode invocar 1 carta de 1 ação ou mover 1 peça!');
+            'Você ainda pode invocar 1 carta de 1 ação ou mover 1 peça!',
+          );
         } else if (podeMover) {
           _mostrarSnackBar('Você ainda pode mover 1 peça neste turno!');
         } else if (temCartaJogavel) {
@@ -1471,8 +1508,12 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
 
       Peca pecaMovendo = tabuleiro[indicePecaSelecionada!]!;
 
-      if (!_movimentoValido(indicePecaSelecionada!, index, pecaMovendo.tipo,
-          pecaMovendo.cor)) {
+      if (!_movimentoValido(
+        indicePecaSelecionada!,
+        index,
+        pecaMovendo.tipo,
+        pecaMovendo.cor,
+      )) {
         _mostrarSnackBar('Movimento inválido!');
         return;
       }
@@ -1485,7 +1526,8 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
       pecaMovendo.posicao = index;
 
       int? posReiAposMovimento = _encontrarRei(turnoAtual);
-      bool aindaEmXeque = posReiAposMovimento != null &&
+      bool aindaEmXeque =
+          posReiAposMovimento != null &&
           _casaSobAtaque(posReiAposMovimento, turnoAtual.oposta);
 
       tabuleiro.remove(index);
@@ -1545,7 +1587,8 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
       acoesRestantes -= 1;
 
       final int linhaDestino = index ~/ 8;
-      final bool chegouUltimaCasa = pecaMovendo.tipo == TipoPeca.peao &&
+      final bool chegouUltimaCasa =
+          pecaMovendo.tipo == TipoPeca.peao &&
           ((pecaMovendo.cor == CorPeca.branco && linhaDestino == 0) ||
               (pecaMovendo.cor == CorPeca.preto && linhaDestino == 7));
 
@@ -1565,7 +1608,8 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
         _finalizarTurno();
       } else {
         _mostrarSnackBar(
-            'Você ainda pode invocar 1 carta de 1 ação neste turno!');
+          'Você ainda pode invocar 1 carta de 1 ação neste turno!',
+        );
       }
     });
   }
@@ -1609,18 +1653,22 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                 context: context,
                 builder: (context) => AlertDialog(
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   title: const Text('Reiniciar Partida'),
-                  content:
-                      const Text('Tem certeza de que deseja reiniciar o jogo?'),
+                  content: const Text(
+                    'Tem certeza de que deseja reiniciar o jogo?',
+                  ),
                   actions: [
                     TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('Cancelar')),
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('Cancelar'),
+                    ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.redAccent,
-                          foregroundColor: Colors.white),
+                        backgroundColor: Colors.redAccent,
+                        foregroundColor: Colors.white,
+                      ),
                       onPressed: () {
                         Navigator.of(context).pop();
                         _iniciarJogo();
@@ -1641,26 +1689,37 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
               // Barra Financeira
               Container(
                 margin: const EdgeInsets.all(12),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 20,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.grey[850],
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.4),
-                        blurRadius: 6,
-                        offset: const Offset(0, 3)),
+                      color: Colors.black.withOpacity(0.4),
+                      blurRadius: 6,
+                      offset: const Offset(0, 3),
+                    ),
                   ],
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildStatusJogador('Branco', statusBranco.dinheiro,
-                        turnoAtual == CorPeca.branco, Colors.amber),
+                    _buildStatusJogador(
+                      'Branco',
+                      statusBranco.dinheiro,
+                      turnoAtual == CorPeca.branco,
+                      Colors.amber,
+                    ),
                     Container(height: 24, width: 1, color: Colors.white24),
-                    _buildStatusJogador('Preto', statusPreto.dinheiro,
-                        turnoAtual == CorPeca.preto, Colors.lightBlueAccent),
+                    _buildStatusJogador(
+                      'Preto',
+                      statusPreto.dinheiro,
+                      turnoAtual == CorPeca.preto,
+                      Colors.lightBlueAccent,
+                    ),
                   ],
                 ),
               ),
@@ -1677,26 +1736,29 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                         boxShadow: [
                           if (estaEmXeque)
                             BoxShadow(
-                                color: Colors.redAccent.withOpacity(0.8),
-                                blurRadius: 20,
-                                spreadRadius: 4)
+                              color: Colors.redAccent.withOpacity(0.8),
+                              blurRadius: 20,
+                              spreadRadius: 4,
+                            )
                           else if (emModoSelecao)
                             BoxShadow(
-                                color: Colors.blueAccent.withOpacity(0.8),
-                                blurRadius: 20,
-                                spreadRadius: 4)
+                              color: Colors.blueAccent.withOpacity(0.8),
+                              blurRadius: 20,
+                              spreadRadius: 4,
+                            )
                           else
                             BoxShadow(
-                                color: Colors.black.withOpacity(0.6),
-                                blurRadius: 12,
-                                spreadRadius: 2),
+                              color: Colors.black.withOpacity(0.6),
+                              blurRadius: 12,
+                              spreadRadius: 2,
+                            ),
                         ],
                         border: Border.all(
                           color: estaEmXeque
                               ? Colors.red.shade700
                               : emModoSelecao
-                                  ? Colors.blue.shade600
-                                  : Colors.brown.shade800,
+                              ? Colors.blue.shade600
+                              : Colors.brown.shade800,
                           width: 6,
                         ),
                       ),
@@ -1706,7 +1768,8 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                           physics: const NeverScrollableScrollPhysics(),
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 8),
+                                crossAxisCount: 8,
+                              ),
                           itemCount: 64,
                           itemBuilder: (context, gridIndex) {
                             final int index = (turnoAtual == CorPeca.preto)
@@ -1717,7 +1780,8 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                             final bool eCasaBranca = (linha + coluna) % 2 == 0;
                             final Peca? peca = tabuleiro[index];
 
-                            bool podeInvocarAqui = cartaSelecionada != null &&
+                            bool podeInvocarAqui =
+                                cartaSelecionada != null &&
                                 !tabuleiro.containsKey(index) &&
                                 ((turnoAtual == CorPeca.branco && linha >= 6) ||
                                     (turnoAtual == CorPeca.preto &&
@@ -1747,7 +1811,8 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
 
                             bool estaMovendo = indicePecaSelecionada == index;
                             bool eOReiEmXeque = index == posReiEmXeque;
-                            bool alvoValidoEfeito = emModoSelecao &&
+                            bool alvoValidoEfeito =
+                                emModoSelecao &&
                                 _casaValidaParaModo(index, modoSelecao);
 
                             Color corCasa = eCasaBranca
@@ -1758,23 +1823,31 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                             if (alvoValidoEfeito) {
                               corCasa = Colors.blue.shade700.withOpacity(0.68);
                               bordaCasa = Border.all(
-                                  color: Colors.lightBlueAccent, width: 3);
+                                color: Colors.lightBlueAccent,
+                                width: 3,
+                              );
                             } else if (eOReiEmXeque) {
                               corCasa = Colors.red.shade900.withOpacity(0.85);
-                              bordaCasa =
-                                  Border.all(color: Colors.redAccent, width: 3.5);
+                              bordaCasa = Border.all(
+                                color: Colors.redAccent,
+                                width: 3.5,
+                              );
                             } else if (podeInvocarAqui) {
                               corCasa = Colors.green.withOpacity(0.5);
-                              bordaCasa =
-                                  Border.all(color: Colors.greenAccent, width: 2);
+                              bordaCasa = Border.all(
+                                color: Colors.greenAccent,
+                                width: 2,
+                              );
                             } else if (casaAmeacadaParaRei) {
                               corCasa = Colors.redAccent.withOpacity(0.6);
                             }
 
                             if (estaMovendo) {
                               corCasa = Colors.amber.shade400;
-                              bordaCasa =
-                                  Border.all(color: Colors.amberAccent, width: 3);
+                              bordaCasa = Border.all(
+                                color: Colors.amberAccent,
+                                width: 3,
+                              );
                             }
 
                             return GestureDetector(
@@ -1799,7 +1872,8 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                                                   Shadow(
                                                     offset: const Offset(1, 1),
                                                     blurRadius: 3,
-                                                    color: peca.cor ==
+                                                    color:
+                                                        peca.cor ==
                                                             CorPeca.preto
                                                         ? Colors.white54
                                                         : Colors.black87,
@@ -1836,15 +1910,20 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                                           width: 32,
                                           height: 32,
                                           decoration: BoxDecoration(
-                                            color:
-                                                Colors.purple.withOpacity(0.75),
+                                            color: Colors.purple.withOpacity(
+                                              0.75,
+                                            ),
                                             shape: BoxShape.circle,
                                             border: Border.all(
-                                                color: Colors.purpleAccent,
-                                                width: 2),
+                                              color: Colors.purpleAccent,
+                                              width: 2,
+                                            ),
                                           ),
-                                          child: const Icon(Icons.lock,
-                                              size: 18, color: Colors.white),
+                                          child: const Icon(
+                                            Icons.lock,
+                                            size: 18,
+                                            color: Colors.white,
+                                          ),
                                         ),
                                       ),
                                     if (movimentoValidoParaCasa &&
@@ -1859,8 +1938,9 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                                             shape: BoxShape.circle,
                                             boxShadow: const [
                                               BoxShadow(
-                                                  color: Colors.white70,
-                                                  blurRadius: 4),
+                                                color: Colors.white70,
+                                                blurRadius: 4,
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -1882,13 +1962,15 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                 padding: const EdgeInsets.all(12.0),
                 decoration: BoxDecoration(
                   color: Colors.grey[850],
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(20)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(20),
+                  ),
                   boxShadow: [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.5),
-                        blurRadius: 10,
-                        offset: const Offset(0, -4)),
+                      color: Colors.black.withOpacity(0.5),
+                      blurRadius: 10,
+                      offset: const Offset(0, -4),
+                    ),
                   ],
                 ),
                 height: 155,
@@ -1901,12 +1983,14 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                         const Text(
                           '🂠 Sua Mão de Cartas:',
                           style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14),
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
                         ),
                         ElevatedButton.icon(
-                          onPressed: (exibeEscolhaDeCarta ||
+                          onPressed:
+                              (exibeEscolhaDeCarta ||
                                   escolhendoPromocaoPeao ||
                                   emModoSelecao)
                               ? null
@@ -1918,9 +2002,12 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                             foregroundColor: Colors.black,
                             elevation: 3,
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 14, vertical: 6),
+                              horizontal: 14,
+                              vertical: 6,
+                            ),
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
                         ),
                       ],
@@ -1935,11 +2022,13 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                           final bool estaSelecionada =
                               indiceCartaSelecionada == index;
                           final int custoAtual = _calcularCustoCarta(
-                              carta, turnoAtual,
-                              consumir: false);
+                            carta,
+                            turnoAtual,
+                            consumir: false,
+                          );
                           final bool bloqueada =
                               _status(turnoAtual).bloqueioNavalRodadas > 0 &&
-                                  carta.custo >= 50;
+                              carta.custo >= 50;
 
                           Color corBadgeCusto = Colors.green.shade800;
                           if (bloqueada) {
@@ -1981,11 +2070,11 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                                   colors: estaSelecionada
                                       ? [
                                           Colors.amber.shade200,
-                                          Colors.amber.shade400
+                                          Colors.amber.shade400,
                                         ]
                                       : [
                                           Colors.grey.shade100,
-                                          Colors.grey.shade300
+                                          Colors.grey.shade300,
                                         ],
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
@@ -2000,17 +2089,17 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                                 boxShadow: estaSelecionada
                                     ? [
                                         BoxShadow(
-                                            color:
-                                                Colors.amber.withOpacity(0.6),
-                                            blurRadius: 10,
-                                            spreadRadius: 2),
+                                          color: Colors.amber.withOpacity(0.6),
+                                          blurRadius: 10,
+                                          spreadRadius: 2,
+                                        ),
                                       ]
                                     : [
                                         BoxShadow(
-                                            color:
-                                                Colors.black.withOpacity(0.2),
-                                            blurRadius: 4,
-                                            offset: const Offset(0, 2)),
+                                          color: Colors.black.withOpacity(0.2),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        ),
                                       ],
                               ),
                               child: Column(
@@ -2019,20 +2108,25 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                                   Text(
                                     carta.tipoPeca.simbolo(turnoAtual),
                                     style: const TextStyle(
-                                        fontSize: 28, color: Colors.black87),
+                                      fontSize: 28,
+                                      color: Colors.black87,
+                                    ),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
                                     carta.tipoPeca.nome,
                                     style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13,
-                                        color: Colors.black),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                      color: Colors.black,
+                                    ),
                                   ),
                                   const SizedBox(height: 4),
                                   Container(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 2),
+                                      horizontal: 8,
+                                      vertical: 2,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: corBadgeCusto,
                                       borderRadius: BorderRadius.circular(10),
@@ -2042,9 +2136,10 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                                           ? '🚫 Bloq.'
                                           : '🪙 \$$custoAtual',
                                       style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 11),
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 11,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -2070,30 +2165,37 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
               left: 0,
               right: 0,
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8,
+                  horizontal: 16,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.red.shade900,
                   boxShadow: const [
                     BoxShadow(
-                        color: Colors.black54,
-                        blurRadius: 6,
-                        offset: Offset(0, 3)),
+                      color: Colors.black54,
+                      blurRadius: 6,
+                      offset: Offset(0, 3),
+                    ),
                   ],
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
-                    Icon(Icons.warning_amber_rounded,
-                        color: Colors.amberAccent, size: 24),
+                    Icon(
+                      Icons.warning_amber_rounded,
+                      color: Colors.amberAccent,
+                      size: 24,
+                    ),
                     SizedBox(width: 8),
                     Flexible(
                       child: Text(
                         '🚨 REI EM XEQUE! Defenda seu Rei para continuar jogando!',
                         style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13),
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
                       ),
                     ),
                   ],
@@ -2108,15 +2210,18 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
               left: 0,
               right: 0,
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8,
+                  horizontal: 16,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.blue.shade900,
                   boxShadow: const [
                     BoxShadow(
-                        color: Colors.black54,
-                        blurRadius: 6,
-                        offset: Offset(0, 3)),
+                      color: Colors.black54,
+                      blurRadius: 6,
+                      offset: Offset(0, 3),
+                    ),
                   ],
                 ),
                 child: Row(
@@ -2127,9 +2232,10 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                         _textoBannerSelecao(),
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13),
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
                       ),
                     ),
                   ],
@@ -2147,25 +2253,33 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                 opacity: mensagemNotificacao != null ? 1.0 : 0.0,
                 child: Container(
                   constraints: const BoxConstraints(maxWidth: 260),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xEE2B0E12),
                     borderRadius: BorderRadius.circular(10),
-                    border:
-                        Border.all(color: Colors.amber.shade300, width: 1.5),
+                    border: Border.all(
+                      color: Colors.amber.shade300,
+                      width: 1.5,
+                    ),
                     boxShadow: const [
                       BoxShadow(
-                          color: Colors.black87,
-                          blurRadius: 8,
-                          offset: Offset(0, 3)),
+                        color: Colors.black87,
+                        blurRadius: 8,
+                        offset: Offset(0, 3),
+                      ),
                     ],
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.info_outline,
-                          color: Colors.amber, size: 18),
+                      const Icon(
+                        Icons.info_outline,
+                        color: Colors.amber,
+                        size: 18,
+                      ),
                       const SizedBox(width: 8),
                       Flexible(
                         child: Text(
@@ -2192,7 +2306,8 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                   elevation: 12,
                   color: Colors.grey[900],
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                   margin: const EdgeInsets.all(20.0),
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(20.0),
@@ -2204,9 +2319,10 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                               ? '🎖️ Decreto de Promoção!'
                               : '👑 Promoção de Peão!',
                           style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.amberAccent),
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.amberAccent,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         const Text(
@@ -2219,61 +2335,73 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                           spacing: 12,
                           runSpacing: 12,
                           alignment: WrapAlignment.center,
-                          children: (promocaoPorDecreto
-                                  ? [TipoPeca.cavalo, TipoPeca.bispo]
-                                  : [
-                                      TipoPeca.rainha,
-                                      TipoPeca.torre,
-                                      TipoPeca.bispo,
-                                      TipoPeca.cavalo,
-                                    ])
-                              .map((tipo) {
-                            return InkWell(
-                              onTap: () => _promoverPeao(tipo),
-                              borderRadius: BorderRadius.circular(12),
-                              child: Container(
-                                width: 110,
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 14, horizontal: 10),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Colors.brown.shade700,
-                                      Colors.brown.shade900
-                                    ],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                      color: Colors.amber.shade600, width: 2),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                        color: Colors.black45,
-                                        blurRadius: 6,
-                                        offset: Offset(0, 3)),
-                                  ],
-                                ),
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      tipo.simbolo(turnoAtual),
-                                      style: const TextStyle(
-                                          fontSize: 40, color: Colors.white),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      tipo.nome,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                          fontSize: 14),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          }).toList(),
+                          children:
+                              (promocaoPorDecreto
+                                      ? [TipoPeca.cavalo, TipoPeca.bispo]
+                                      : [
+                                          TipoPeca.rainha,
+                                          TipoPeca.torre,
+                                          TipoPeca.bispo,
+                                          TipoPeca.cavalo,
+                                        ])
+                                  .map((tipo) {
+                                    return InkWell(
+                                      onTap: () => _promoverPeao(tipo),
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Container(
+                                        width: 110,
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 14,
+                                          horizontal: 10,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Colors.brown.shade700,
+                                              Colors.brown.shade900,
+                                            ],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.amber.shade600,
+                                            width: 2,
+                                          ),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Colors.black45,
+                                              blurRadius: 6,
+                                              offset: Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                              tipo.simbolo(turnoAtual),
+                                              style: const TextStyle(
+                                                fontSize: 40,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 6),
+                                            Text(
+                                              tipo.nome,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  })
+                                  .toList(),
                         ),
                       ],
                     ),
@@ -2291,7 +2419,8 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                   elevation: 12,
                   color: Colors.grey[900],
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                   margin: const EdgeInsets.all(20.0),
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(20.0),
@@ -2303,9 +2432,10 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                               ? '✨ Escolha uma Carta de Efeito'
                               : '⚔️ Escolha uma Nova Peça',
                           style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                         const SizedBox(height: 20),
                         if (!escolhendoEfeito)
@@ -2322,45 +2452,60 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                                     gradient: LinearGradient(
                                       colors: [
                                         Colors.brown.shade700,
-                                        Colors.brown.shade900
+                                        Colors.brown.shade900,
                                       ],
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
                                     ),
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
-                                        color: Colors.amber.shade700, width: 2),
+                                      color: Colors.amber.shade700,
+                                      width: 2,
+                                    ),
                                     boxShadow: const [
                                       BoxShadow(
-                                          color: Colors.black45,
-                                          blurRadius: 6,
-                                          offset: Offset(0, 3)),
+                                        color: Colors.black45,
+                                        blurRadius: 6,
+                                        offset: Offset(0, 3),
+                                      ),
                                     ],
                                   ),
                                   child: Column(
                                     children: [
-                                      Text(carta.tipoPeca.simbolo(turnoAtual),
-                                          style: const TextStyle(
-                                              fontSize: 42,
-                                              color: Colors.white)),
+                                      Text(
+                                        carta.tipoPeca.simbolo(turnoAtual),
+                                        style: const TextStyle(
+                                          fontSize: 42,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                                       const SizedBox(height: 8),
-                                      Text(carta.tipoPeca.nome,
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white)),
+                                      Text(
+                                        carta.tipoPeca.nome,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                                       const SizedBox(height: 6),
                                       Container(
                                         padding: const EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 4),
+                                          horizontal: 10,
+                                          vertical: 4,
+                                        ),
                                         decoration: BoxDecoration(
                                           color: Colors.green.shade700,
-                                          borderRadius:
-                                              BorderRadius.circular(12),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
                                         ),
-                                        child: Text('🪙 \$${carta.custo}',
-                                            style: const TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold)),
+                                        child: Text(
+                                          '🪙 \$${carta.custo}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -2371,11 +2516,13 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                         else
                           Column(
                             children: opcoesEfeitoAtual.map((efeito) {
-                              final Color corCard =
-                                  corRaridade(efeito.raridade);
+                              final Color corCard = corRaridade(
+                                efeito.raridade,
+                              );
                               return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 6.0),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 6.0,
+                                ),
                                 child: InkWell(
                                   onTap: () => _escolherEfeito(efeito),
                                   borderRadius: BorderRadius.circular(12),
@@ -2384,12 +2531,15 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                                     decoration: BoxDecoration(
                                       color: Colors.grey[850],
                                       borderRadius: BorderRadius.circular(12),
-                                      border:
-                                          Border.all(color: corCard, width: 2),
+                                      border: Border.all(
+                                        color: corCard,
+                                        width: 2,
+                                      ),
                                       boxShadow: [
                                         BoxShadow(
-                                            color: corCard.withOpacity(0.3),
-                                            blurRadius: 6),
+                                          color: corCard.withOpacity(0.3),
+                                          blurRadius: 6,
+                                        ),
                                       ],
                                     ),
                                     child: Row(
@@ -2405,42 +2555,50 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                                                         .spaceBetween,
                                                 children: [
                                                   Flexible(
-                                                    child: Text(efeito.titulo,
-                                                        style: const TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 16,
-                                                            color:
-                                                                Colors.white)),
+                                                    child: Text(
+                                                      efeito.titulo,
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 16,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
                                                   ),
                                                   const SizedBox(width: 8),
                                                   Container(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 8,
-                                                        vertical: 2),
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 8,
+                                                          vertical: 2,
+                                                        ),
                                                     decoration: BoxDecoration(
                                                       color: corCard,
                                                       borderRadius:
                                                           BorderRadius.circular(
-                                                              8),
+                                                            8,
+                                                          ),
                                                     ),
                                                     child: Text(
-                                                        efeito.raridade,
-                                                        style: const TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 11,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold)),
+                                                      efeito.raridade,
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 11,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
                                                   ),
                                                 ],
                                               ),
                                               const SizedBox(height: 4),
-                                              Text(efeito.descricao,
-                                                  style: const TextStyle(
-                                                      color: Colors.white70,
-                                                      fontSize: 13)),
+                                              Text(
+                                                efeito.descricao,
+                                                style: const TextStyle(
+                                                  color: Colors.white70,
+                                                  fontSize: 13,
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -2468,7 +2626,9 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
                 child: Center(
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 32, vertical: 20),
+                      horizontal: 32,
+                      vertical: 20,
+                    ),
                     decoration: BoxDecoration(
                       color: turnoAtual == CorPeca.branco
                           ? const Color(0xF2F7F4EB)
@@ -2526,7 +2686,11 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
   }
 
   Widget _buildStatusJogador(
-      String nome, int saldo, bool eTurnoAtual, Color corDestaque) {
+    String nome,
+    int saldo,
+    bool eTurnoAtual,
+    Color corDestaque,
+  ) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
@@ -2550,9 +2714,10 @@ class _TabuleiroXadrezState extends State<TabuleiroXadrez> {
           Text(
             '🪙 \$$saldo',
             style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.greenAccent),
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.greenAccent,
+            ),
           ),
         ],
       ),
